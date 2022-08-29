@@ -2,3 +2,5 @@ gdstk
 gdspy
 pyclipper
 mapbox_earcut
+amaranth
+amaranth-yosys
