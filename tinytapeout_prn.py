@@ -41,10 +41,17 @@ class PRN(am.Elaboratable):
         m.d.sync += g2.eq(am.Cat(g2fb, g2))
         m.d.comb += self.io_out[1].eq(g2[9])
 
-        # Output PRNs 1..6 on the remaining outputs.
-        prns = ((2, 6), (3, 7), (4, 8), (5, 9), (1, 9), (2, 10))
-        for i, (t1, t2) in enumerate(prns):
-            m.d.comb += self.io_out[i+2].eq(g2[t1 - 1] ^ g2[t2 - 1] ^ g1[9])
+        # Generate output PRN sequence based on selected PRN.
+        prn_taps = (
+            (2, 6), (3, 7), (4, 8), (5, 9), (1, 9), (2, 10), (1, 8), (2, 9),
+            (3, 10), (2, 3), (3, 4), (5, 6), (6, 7), (7, 8), (8, 9), (9, 10),
+            (1, 4), (2, 5), (3, 6), (4, 7), (5, 8), (6, 9), (1, 3), (4, 6),
+            (5, 7), (6, 8), (7, 9), (8, 10), (1, 6), (2, 7), (3, 8), (4, 9),
+        )
+        prns = am.Signal(len(prn_taps))
+        for i, (t1, t2) in enumerate(prn_taps):
+            m.d.comb += prns[i].eq(g2[t1 - 1] ^ g2[t2 - 1] ^ g1[9])
+        m.d.comb += self.io_out[2].eq(am.Array(prns)[self.io_in[2:7]])
 
         return m
 
@@ -64,15 +71,17 @@ def test():
         yield prn.io_in[1].eq(0)
         yield
 
+        # Select PRN2
+        yield prn.io_in[2:7].eq(2 - 1)
+
         # Collect 20 output bits
-        prns = [[], [], [], [], [], []]
+        out = []
         for _ in range(20):
-            for i in range(len(prns)):
-                prns[i].append((yield prn.io_out[i+2]))
+            out.append((yield prn.io_out[2]))
             yield
 
         # Test PRN2 has the first 20 bits correct.
-        assert prns[1][:20] == [
+        assert out == [
             1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1]
 
     sim = Simulator(prn)
