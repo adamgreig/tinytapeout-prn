@@ -1,5 +1,5 @@
 # Ensure this ID is unique per-project.
-WOKWI_PROJECT_ID=339800239192932947
+WOKWI_PROJECT_ID=341342096033055316
 
 fetch:
 	# Instead of fetching verilog, build it with Amaranth.
