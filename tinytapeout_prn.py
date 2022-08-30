@@ -33,13 +33,13 @@ class PRN(am.Elaboratable):
         # G1 shift register.
         g1 = am.Signal(10, reset=-1)
         m.d.sync += g1.eq(am.Cat(g1[2] ^ g1[9], g1))
-        m.d.comb += self.io_out[0].eq(g1[9])
+        m.d.sync += self.io_out[0].eq(g1[9])
 
         # G2 shift register.
         g2 = am.Signal(10, reset=-1)
         g2fb = g2[1] ^ g2[2] ^ g2[5] ^ g2[7] ^ g2[8] ^ g2[9]
         m.d.sync += g2.eq(am.Cat(g2fb, g2))
-        m.d.comb += self.io_out[1].eq(g2[9])
+        m.d.sync += self.io_out[1].eq(g2[9])
 
         # Generate output PRN sequence based on selected PRN.
         prn_taps = (
@@ -51,7 +51,7 @@ class PRN(am.Elaboratable):
         prns = am.Signal(len(prn_taps))
         for i, (t1, t2) in enumerate(prn_taps):
             m.d.comb += prns[i].eq(g2[t1 - 1] ^ g2[t2 - 1] ^ g1[9])
-        m.d.comb += self.io_out[2].eq(am.Array(prns)[self.io_in[2:7]])
+        m.d.sync += self.io_out[2].eq(am.Array(prns)[self.io_in[2:7]])
 
         return m
 
@@ -76,6 +76,7 @@ def test():
 
         # Collect 20 output bits
         out = []
+        yield
         for _ in range(20):
             out.append((yield prn.io_out[2]))
             yield
