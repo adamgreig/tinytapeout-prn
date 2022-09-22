@@ -1,0 +1,37 @@
+--- 
+# TinyTapeout project information
+#
+# As everyone will have access to all designs, try to make it easy for someone new to your design to know what
+# it does and how to operate it.
+#
+# This will be automatically collected and used to make a datasheet for the chip.
+project: 
+  author:       "Adam Greig"
+  title:        "GPS C/A PRN Generator"
+  description:  "Generate any of the GPS C/A PRN sequences from PRN0 to PRN31"
+  how_it_works: "Instantiates the GPS G1 and G2 LFSRs to generate a pseudo-random sequence, then selects the G2 output taps based on the input signals to output the chosen sequence."
+  how_to_test:  "Apply clock to the in[0], pulse reset on in[1], choose a PRN between 0 and 31 using in[2:7], then the G1 sequence is emitted on out[0], the G2 sequence on out[1], and the selected PRN on out[2]. The first 20 bits of PRN2 are 11100100001110000011."
+  external_hw:  "None"
+  doc_link:     "https://github.com/adamgreig/tinytapeout-prn/"
+  clock_hz:     1000
+  language:     "Amaranth"
+  wokwi_id:     341342096033055316
+  picture:      ""
+  inputs:
+    - clock
+    - reset
+    - prn[0]
+    - prn[1]
+    - prn[2]
+    - prn[3]
+    - prn[4]
+    - none
+  outputs:
+    - G1 subsequence
+    - G2 subsequence
+    - Selected PRN
+    - None
+    - None
+    - None
+    - None
+    - None
